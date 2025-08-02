@@ -4,7 +4,7 @@ const postSchema = require('./Post')
 const commentSchema = require('./Comment')
 const reportSchema = require('./Report')
 const subverseSchema = require('./Subverse')
-const voteSchema = require('/Vote')
+const voteSchema = require('./Vote')
 
 const User = mongoose.model('User', userSchema)
 const Post = mongoose.model('Post', postSchema)

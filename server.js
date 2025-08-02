@@ -1,6 +1,7 @@
 const express = require('express')
 const logger = require('morgan')
 const cors = require('cors')
+const SubverseRouter = require('./routes/SubverseRouter')
 
 const AuthRouter = require('./routes/AuthRouter')
 
@@ -21,6 +22,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 app.use('/auth', AuthRouter)
+app.use('/subverses', SubverseRouter)
 
 app.use('/', (req, res) => {
     res.send('Connected!')
