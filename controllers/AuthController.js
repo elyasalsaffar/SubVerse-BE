@@ -9,7 +9,7 @@ const Register = async (req, res) => {
     if (existingUser) {
       return res.status(400).send('A user with that email has already been registered!')
     } else {
-      const user = await User.create({ first, last, email, passwordDigest, phone })
+      const user = await User.create({ username, email, passwordDigest })
       res.status(200).send(user)
     }
   } catch (error) {
