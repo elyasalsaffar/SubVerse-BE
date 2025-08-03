@@ -20,7 +20,7 @@ createToken = (payload) => {
     return token
 }
 
-const stripToken = (res, req, next) => {
+const stripToken = (req, res, next) => {
     try {
         const authHeader = req.headers['authorization'];
 
