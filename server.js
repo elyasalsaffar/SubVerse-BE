@@ -5,6 +5,7 @@ const SubverseRouter = require('./routes/SubverseRouter')
 const PostRouter = require('./routes/PostRouter')
 const VoteRouter = require('./routes/VoteRouter')
 const CommentRouter = require('./routes/CommentRouter')
+const ReportRouter = require('./routes/ReportRouter')
 
 const AuthRouter = require('./routes/AuthRouter')
 
@@ -30,6 +31,7 @@ app.use('/subverses', SubverseRouter)
 app.use('/posts', PostRouter)
 app.use('/votes', VoteRouter)
 app.use('./comments', CommentRouter)
+app.use('/reports', ReportRouter)
 
 app.use('/', (req, res) => {
     res.send('Connected!')
