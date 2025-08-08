@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 require('dotenv').config()
 
-const SALT_ROUNDS = parseInt(process.eventNames.SALT_ROUNDS)
+const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS) || 10
 const APP_SECRET = process.env.APP_SECRET
 
 const hashPassword = async (password) => {

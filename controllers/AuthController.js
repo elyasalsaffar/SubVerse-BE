@@ -21,6 +21,11 @@ const Login = async (req, res) => {
   try {
     const { email, password } = req.body
     const user = await User.findOne({ email })
+
+    if (!user) {
+      return res.status(404).send({ msg: 'No user found with that email' })
+    }
+
     let matched = await middleware.comparePassword(
       password,
       user.passwordDigest
@@ -48,6 +53,15 @@ const UpdatePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body
     let user = await User.findById(req.params.user_id)
+
+    if (!user) {
+      return res.status(404).send({ msg: 'User not found' })
+    }
+
+    if (req.params.user_id !== res.locals.payload.id) {
+  return res.status(403).send({ msg: 'Unauthorized to update this user' })
+  }
+
     let matched = await middleware.comparePassword(
       oldPassword,
       user.passwordDigest
@@ -75,7 +89,7 @@ const UpdatePassword = async (req, res) => {
 
 const UpdateUser = async (req, res) => {
   try {
-    const { username, email } = req.body
+    const { username, email, password } = req.body
     let updatedFields = { username, email }
 
     if (password) {
