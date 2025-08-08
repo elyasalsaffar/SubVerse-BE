@@ -17,11 +17,10 @@ const voteSchema = require('./models/Vote')
 
 const app = express()
 
-// app.use(cors({
-    // Include the frontend deployment link
-    // origin: '',
-    // credentials: true
-// }))
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}))
 
 app.use(logger('dev'))
 app.use(express.json())
