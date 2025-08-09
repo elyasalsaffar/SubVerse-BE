@@ -30,7 +30,7 @@ app.use('/auth', AuthRouter)
 app.use('/subverses', SubverseRouter)
 app.use('/posts', PostRouter)
 app.use('/votes', VoteRouter)
-app.use('./comments', CommentRouter)
+app.use('/comments', CommentRouter)
 app.use('/reports', ReportRouter)
 app.use('/admin', AdminRouter)
 
