@@ -40,7 +40,7 @@ const GetAllPosts = async (req, res) => {
 
         const posts = await Post.find(filter).populate('createdBy', 'username')
                                              .populate('subverseId', 'name')
-                                             .sort(sort === 'top' ? { votesCount: -1 } : { createtedAt: -1 })
+                                             .sort(sort === 'top' ? { votesCount: -1 } : { createdAt: -1 })
         
         res.status(200).send(posts)                                     
     } catch (error) {
