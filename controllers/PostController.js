@@ -48,7 +48,7 @@ const GetAllPosts = async (req, res) => {
     }
 }
 
-// Get single post
+// Get a single post
 const GetPostById = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id).populate('createdBy', 'username')
