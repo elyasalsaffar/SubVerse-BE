@@ -7,7 +7,7 @@ const ReportUser = async (req, res) => {
         const { reportedUserId, reason } = req.body
 
         if (reportingUserId === reportedUserId) {
-            return res.status(400).send({ msg: "Your can't report yourself" })
+            return res.status(400).send({ msg: "You can't report yourself" })
         }
 
         const existing = await Report.findOne({ reportedUserId, reportingUserId })
@@ -15,14 +15,12 @@ const ReportUser = async (req, res) => {
             return res.status(400).send({ msg: 'You already reported this user' })
         }
 
-        const report = await Report.create({ reportedUserId, reportingUserId, reason })
+        await Report.create({ reportedUserId, reportingUserId, reason })
         const totalReports = await Report.countDocuments({ reportedUserId })
 
-        if (totalReports >= 5) {
-            await User.findByIdAndUpdate(reportedUserId, { reportCount: totalReports })
-        }
+        await User.findByIdAndUpdate(reportedUserId, { reportCount: totalReports })
 
-        res.status(201).send({ msg: 'Report submitted', report })
+        res.status(201).send({ msg: 'Report submitted', totalReports })
     } catch (error) {
         console.error(error)
         res.status(500).send({ msg: 'Failed to report user' })
@@ -36,7 +34,7 @@ const GetFlaggedUsers = async (req, res) => {
             return res.status(403).send({ msg: 'Only admin can view flagged users' })
         }
 
-        const flaggedUsers = await User.find({ reportCount: { $gte: 5 } }).select('username reportCount isSuspended')
+        const flaggedUsers = await User.find({ reportCount: { $gte: 5 } }).select('username email reportCount isSuspended')
         
         res.status(200).send(flaggedUsers)
     } catch (error) {

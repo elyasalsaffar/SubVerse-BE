@@ -1,4 +1,4 @@
-const { User } = require('../models')
+const { User, Report } = require('../models')
 const middleware = require('../middleware')
 
 const Register = async (req, res) => {
@@ -122,6 +122,30 @@ const GetAllUsers = async (req, res) => {
     const users = await User.find({}, '-passwordDigest')
     res.status(200).send(users)
   } catch (error) {
+    res.status(500).send({ msg: 'Failed to fetch users' })
+  }
+}
+
+const GetAllUser = async (req, res) => {
+  try {
+    const users = await User.find({}, '-passwordDigest').lean()
+    const userIds = users.map(u => u._id)
+    const reportCounts = await Report.aggregate([
+      { $match: { reportedUserId: { $in: userIds } } },
+      { $group: { _id: '$reportedUserId', count: { $sum: 1 } } }
+    ])
+    const countsMap = {}
+    reportCounts.forEach(r => {
+      countsMap[r._id.toString()] = r.count
+    })
+    const usersWithCounts = users.map(u => ({
+      ...u,
+      reportCount: countsMap[u._id.toString()] || 0
+    }))
+
+    res.status(200).send(usersWithCounts)
+  } catch (error) {
+    console.error(error)
     res.status(500).send({ msg: 'Failed to fetch users' })
   }
 }
