@@ -1,4 +1,5 @@
 const { Post, User, Subverse } = require('../models')
+const mongoose = require('mongoose')
 
 // Create a new post
 const CreatePost = async (req, res) => {
@@ -32,20 +33,90 @@ const CreatePost = async (req, res) => {
 
 // Get all posts + includes filtering
 const GetAllPosts = async (req, res) => {
-    try {
-        const { subverseId, sort } = req.query
+  try {
+    const { subverseId, sort } = req.query
 
-        let filter = {}
-        if (subverseId) filter.subverseId = subverseId
+    // --- "Latest" remains simple
+    if (sort !== 'top') {
+      const filter = subverseId ? { subverseId } : {}
+      const posts = await Post.find(filter)
+        .populate('createdBy', 'username')
+        .populate('subverseId', 'name')
+        .sort({ createdAt: -1 })
 
-        const posts = await Post.find(filter).populate('createdBy', 'username')
-                                             .populate('subverseId', 'name')
-                                             .sort(sort === 'top' ? { votesCount: -1 } : { createdAt: -1 })
-        
-        res.status(200).send(posts)                                     
-    } catch (error) {
-        res.status(500).send({ msg: 'Failed to fetch posts' })
+      return res.status(200).send(posts)
     }
+
+    // --- "Top": sort by upvotes only
+    const match = {}
+    if (subverseId) match.subverseId = new mongoose.Types.ObjectId(subverseId)
+
+    const posts = await Post.aggregate([
+      { $match: match },
+      // count ONLY upvotes
+      {
+        $lookup: {
+          from: 'votes',
+          localField: '_id',
+          foreignField: 'postId',
+          as: 'votes'
+        }
+      },
+      {
+        $addFields: {
+          upvotesCount: {
+            $size: {
+              $filter: {
+                input: '$votes',
+                as: 'v',
+                cond: { $eq: ['$$v.type', 'upvote'] }
+              }
+            }
+          }
+        }
+      },
+      { $sort: { upvotesCount: -1, createdAt: -1 } },
+
+      // populate createdBy (username only)
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'createdBy',
+          foreignField: '_id',
+          as: 'createdBy'
+        }
+      },
+      { $unwind: '$createdBy' },
+      {
+        $project: {
+          'createdBy.passwordDigest': 0,
+          votes: 0
+        }
+      },
+
+      // populate subverseId (name only)
+      {
+        $lookup: {
+          from: 'subverses',
+          localField: 'subverseId',
+          foreignField: '_id',
+          as: 'subverseId'
+        }
+      },
+      { $unwind: '$subverseId' },
+      {
+        $project: {
+          'subverseId.createdAt': 0,
+          'subverseId.updatedAt': 0
+        }
+      }
+    ])
+
+    return res.status(200).send(posts)
+  } catch (error) {
+    console.error(error)
+    res.status(500).send({ msg: 'Failed to fetch posts' })
+  }
 }
 
 // Get a single post
