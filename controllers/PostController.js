@@ -36,7 +36,6 @@ const GetAllPosts = async (req, res) => {
   try {
     const { subverseId, sort } = req.query
 
-    // --- "Latest" remains simple
     if (sort !== 'top') {
       const filter = subverseId ? { subverseId } : {}
       const posts = await Post.find(filter)
@@ -47,7 +46,6 @@ const GetAllPosts = async (req, res) => {
       return res.status(200).send(posts)
     }
 
-    // --- "Top": sort by upvotes only
     const match = {}
     if (subverseId) match.subverseId = new mongoose.Types.ObjectId(subverseId)
 

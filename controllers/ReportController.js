@@ -27,7 +27,6 @@ const ReportUser = async (req, res) => {
     }
 }
 
-// Get all users with 5+ reports
 const GetFlaggedUsers = async (req, res) => {
     try {
         if (!res.locals.payload.isAdmin) {
