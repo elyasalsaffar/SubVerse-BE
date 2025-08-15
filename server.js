@@ -1,6 +1,8 @@
 const express = require('express')
 const logger = require('morgan')
 const cors = require('cors')
+require('dotenv').config()
+
 const SubverseRouter = require('./routes/SubverseRouter')
 const PostRouter = require('./routes/PostRouter')
 const VoteRouter = require('./routes/VoteRouter')
@@ -12,15 +14,29 @@ const AuthRouter = require('./routes/AuthRouter')
 
 const PORT = process.env.PORT || 3001
 
-const db = require('./db')
+require('./db')
 const voteSchema = require('./models/Vote')
 
 const app = express()
 
-app.use(cors({
-    origin: 'http://localhost:5173',
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://subverse.surge.sh',
+  process.env.CLIENT_URL
+].filter(Boolean)
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true)
+      if (allowedOrigins.includes(origin)) return callback(null, true)
+      return callback(new Error('Not allowed by CORS: ' + origin), false)
+    },
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
-}))
+  })
+)
 
 app.use(logger('dev'))
 app.use(express.json())
@@ -33,6 +49,8 @@ app.use('/votes', VoteRouter)
 app.use('/comments', CommentRouter)
 app.use('/reports', ReportRouter)
 app.use('/admin', AdminRouter)
+
+app.get('/health', (req, res) => res.send('ok'))
 
 app.use('/', (req, res) => {
     res.send('Connected!')

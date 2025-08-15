@@ -1,9 +1,10 @@
 {
   "name": "subverse-be",
   "version": "1.0.0",
-  "description": "",
+  "description": "SubVerse backend (Express + MongoDB)",
   "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "dev": "node --watch server.js"
   },
   "keywords": [],
