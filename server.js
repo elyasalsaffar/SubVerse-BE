@@ -21,17 +21,21 @@ const app = express()
 
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://subverse.surge.sh',
-  process.env.CLIENT_URL
-].filter(Boolean)
+  'https://subverse.surge.sh'
+];
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true
   })
 )
-
 
 app.use(logger('dev'))
 app.use(express.json())
