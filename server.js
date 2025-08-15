@@ -25,18 +25,10 @@ const allowedOrigins = [
   process.env.CLIENT_URL
 ].filter(Boolean)
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true)
-      if (allowedOrigins.includes(origin)) return callback(null, true)
-      return callback(new Error('Not allowed by CORS: ' + origin), false)
-    },
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-  })
-)
+app.use(cors({
+  origin: 'https://subverse.surge.sh',
+  credentials: true
+}))
 
 app.use(logger('dev'))
 app.use(express.json())
